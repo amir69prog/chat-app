@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>what chat room would you like to enter?</h2>
+    <input type="text" id="room_name">
+    <button onclick="set_path();" id="input_room_name">Enter</button>
+
+    <script>
+
+        function set_path() {
+            var room_name = document.getElementById('room_name');
+            window.location.pathname = room_name.value;
+        }
+
+    </script>
+</body>
+</html>
