@@ -1,0 +1,26 @@
+{% extends 'base/index.html' %}
+
+{% block title %}Search Users{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        {% if users %}
+            {% for profile in users %}
+            <div class="card m-2 p-2" style="width: 18rem;">
+                <img class="card-img-top img-thumbnail" src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}">
+                <div class="card-body">
+                <h3>
+                    <a href="{% url 'user' profile.user.username %}" class="card-title btn btn-primary">{{ profile.user.username }}</a>
+                </h3>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="alert alert-danger m-5">There is no user with <strong>'{{ request.GET.q }}'</strong></div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

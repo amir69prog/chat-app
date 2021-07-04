@@ -1,0 +1,71 @@
+{% extends 'account/indexAccounts.html' %}
+{% block title %}Sign up{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div id="signupbox" style="margin-top:100px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="panel-title">Sign Up</div>
+                <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="{{ login_url }}" >Sign In</a></div>
+            </div>  
+            <div class="panel-body">
+                <form id="signupform" class="form-horizontal" role="form" method="POST" action="{% url 'account_signup' %}">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                    <div id="signupalert" class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <span>{{ error }}</span><br>
+                        {% endfor %}
+                        {% for field in form %}
+                            {% for error in field.errors %}    
+                                <span><strong>{{field.name|title}} :</strong> {{ error }}</span><br>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                        
+                    
+                      
+                    <div class="form-group">
+                        <label for="usernam" class="col-md-3 control-label">Username</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="username" placeholder="Username">
+                        </div>
+                    </div>
+                        
+                    <div class="form-group">
+                        <label for="email" class="col-md-3 control-label">Email</label>
+                        <div class="col-md-9">
+                            <input type="email" class="form-control" name="email" placeholder="E-mail address">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password1" class="col-md-3 control-label">Password</label>
+                        <div class="col-md-9">
+                            <input type="password" class="form-control" name="password1" placeholder="Password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password2" class="col-md-3 control-label">Password</label>
+                        <div class="col-md-9">
+                            <input type="password" class="form-control" name="password2" placeholder="Password (again)">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <!-- Button -->                                        
+                        <div class="col-md-offset-3 col-md-9">
+                            <button id="btn-signup" type="submit" class="btn btn-info"><i class="icon-hand-right"></i> &nbsp Sign Up</button>
+                        </div>
+                    </div>
+                    
+                    
+                </form>
+             </div>
+        </div>    
+</div>
+</div>
+
+{% endblock %}

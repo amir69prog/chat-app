@@ -1,0 +1,13 @@
+{% extends 'base/index.html' %}
+{% block title %}Chat Room{% endblock %}
+{% load static %}
+{% block content %}
+    <h2>what chat room would you like to enter?</h2>
+    <input type="text" id="room_name">
+    <button onclick="set_path();" id="input_room_name">Enter</button>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'chat/index.js' %}"></script>
+{% endblock %}

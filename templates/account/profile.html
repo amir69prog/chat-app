@@ -1,0 +1,114 @@
+{% extends 'base/index.html' %}
+{% load static widget_tweaks request_tags %}
+{% block title %}Profile | {{ profile.user.username }}{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-5">
+        <div class="row align-items-start">
+            <div class="col-9">
+                {% for msg in messages %}
+                    <p class="alert alert-{{ msg.level_tag }}">{{ msg }}</p>
+                {% endfor %}
+                
+                {% if profile_form.errors %}
+                    {% for field in profile_form %}
+                        {% if field.errors %}
+                            <p class="alert alert-warning">
+                                {% for error in field.error %}
+                                    {{field.name}} » {{ msg }}
+                                    <br>
+                                {% endfor %}
+                            </p>    
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if user_form.errors %}
+                    {% for field in user_form %}
+                        {% if field.errors %}
+                            <p class="alert alert-warning">
+                                {% for error in field.errors %}
+                                    {{ field.name }} » {{ error }}
+                                    <br>
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <div class="card">
+                    <div class="card-title">
+                        <h2 class="text-center mt-2">Introduce</h2>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="m-2">
+                            <img width="600px" src="{{ profile.profile_picture.url }}" class="img-thumbnail" alt="{{ profile.user.username }}">
+                        </div>
+                        <div class="m-2">
+                            <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data" class="form-group m-2">
+                                {% csrf_token %}
+                                <div style="float: left;">
+
+                                    <div class="row m-3">
+                                        {% render_field user_form.username disabled='' class='form-control' placeholder='username' %}
+                                    </div>
+
+                                    <div class="row m-3">
+                                        {% render_field user_form.email disabled='' class='form-control' placeholder='email' %}
+                                    </div>
+                                    
+                                    <div class="row m-3">
+                                        {% render_field user_form.first_name disabled='' class='form-control' placeholder="first name"  %}
+                                    </div>
+                                    
+                                    <div class="row m-3">
+                                        {% render_field user_form.last_name disabled='' class='form-control' placeholder="last name" %}
+                                    </div>
+                                    <div class="row m-3">
+                                        {% render_field profile_form.nickname disabled='' class='form-control' placeholder='nickname' %}
+                                    </div>
+                                    
+                                    <div class="m-3">
+                                        <button type="button" onclick="disply_form()" id="edit-btn" class="w-50 btn btn-warning">Edit</button>
+                                        <button type="submit" id="submit-btn" class="d-none btn btn-primary">Submit</button>
+                                    </div>
+
+                                </div>
+                                <div style="float: left;">
+                                    <div class="row m-3">
+                                        {% render_field profile_form.biography disabled='' class="form-control" placeholder="biography" rows="6" %}
+                                    </div>
+                                    
+                                    <div class="m-3">
+                                        {% render_field profile_form.profile_picture disabled='' class='form-control' %}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+               </div>
+            </div>
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-title">
+                        <h2 class="text-center mt-2">Actions</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><a class="btn btn-primary" href="{% url 'friends' %}">Friends <span class="badge bg-danger">{{ user|get_count_friends }}</span></a></li>
+                            <li class="list-group-item"><a class="btn btn-info" href="{% url 'friend_request' %}">Friends Request <span class="badge bg-danger">{{ user|get_count_requests }}</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'chat/profile.js' %}"></script>
+{% endblock %}

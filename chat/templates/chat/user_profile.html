@@ -1,0 +1,78 @@
+{% extends 'base/index.html' %}
+{% load static widget_tweaks %}
+{% block title %}Profile | {{ profile.user.username }}{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-5">
+        <div class="row align-items-start">
+            <div class="col-9">
+                <div class="card">
+                    <div class="card-title">
+                        <h2 class="text-center mt-2">Introduce</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="m-2">
+                            <img width="400px" src="{{ profile.profile_picture.url }}" class="img-thumbnail" alt="{{ profile.user.username }}">
+                        </div>
+                        <div class="m-2">
+                                <div class="row m-3">
+                                    <p><strong>Username : </strong>{{ profile.user.username }}</p>
+                                </div>
+
+                                <div class="row m-3">
+                                    <p><strong>Email : </strong>{{ profile.user.email|default_if_none:'---' }}</p>
+                                </div>
+                                
+                                <div class="row m-3">
+                                    <p><strong>Nickname : </strong>{{ profile.nickname|default_if_none:'---' }}</p>
+                                </div>
+                                
+                                <div class="row m-3">
+                                    <p><strong>Bio : </strong>{{ profile.biography|default_if_none:'---' }}</p>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-title">
+                        <h2 class="text-center mt-2">Actions</h2>
+                    </div>
+                    <div class="text-center p-1">
+                    {% if not is_self %}
+                    {% if is_request %}
+                        {% if have_request %}
+                            <button class="btn btn-info m-1">Requested</button>
+                            <button onclick="cancel_request('{{profile.user}}')" type="submit" class="btn btn-warning m-1">Cancel</button>
+                        {% endif %}
+                        
+                        {% if has_request %}
+                            {% if his_request_friend.status == 'requested' %}
+                                <button onclick="decline_request('{{ profile.user }}')" class="btn btn-danger m-1">Decline</button>
+                                <button onclick="accept_request('{{ profile.user }}')" class="btn btn-success m-1">Accept</button>
+                            {% endif %}
+                        {% endif %}
+                    {% elif is_friend %}
+                       <a href="" class="btn btn-success m-1 w-75">Chat</a>
+                        <button type="button" onclick="remove_friend('{{profile.user}}')" class="btn btn-danger m-1 w-75">Remove</button>
+                    {% else %}
+                        <button type="button" onclick="send_request('{{profile.user}}');" class="btn btn-warning m-1">Send Friend Request</button>
+                    {% endif %}
+                    {% else %}
+                    <a class="btn btn-primary" href="{% url 'profile' %}" >It's yourself (Profile)</a>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'chat/request.js' %}"></script>
+<script src="{% static 'chat/friend.js' %}"></script>
+{% endblock %}

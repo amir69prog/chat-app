@@ -1,0 +1,66 @@
+{% extends 'base/index.html' %}
+{% load static %}
+{% block title %}Requests{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header text-center"><h2>Them requests</h2></div>
+                <ul class="list-group list-group-flush">
+                    {% if they_requests %}
+                        {% for r in they_requests %}
+                        <li class="list-group-item">
+                            <img class="img-fluid rounded-circle" width="50px" src="{{ r.sender.profile.profile_picture.url }}" alt="">
+                            {{ r.sender }} |
+                            <span class="badge bg-info">{{ r.status }}</span>
+                            <button onclick="decline_request('{{r.sender}}');" type="button" class="badge bg-danger">Decline</button>
+                            <button onclick="accept_request('{{r.sender}}');" type="button" class="badge bg-success">Accept</button>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="list-group-item">
+                            <h4>
+                                <span class="badge bg-warning">
+                                    There is no request from them to you
+                                </span>
+                            </h4>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header text-center"><h2>My requests</h2></div>
+                <ul class="list-group list-group-flush">
+                    {% if my_requests %}
+                        {% for r in my_requests %}
+                        <li class="list-group-item">
+                            <img class="img-fluid rounded-circle" width="50px" src="{{ r.receiver.profile.profile_picture.url }}" alt="">
+                            {{ r.receiver }} |
+                            <span class="badge bg-success">{{ r.status }}</span>
+                            <button onclick="cancel_request('{{r.receiver}}');" type="button" class="badge bg-danger">Cancel</button>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="list-group-item">
+                            <h4>
+                                <span class="badge bg-warning">
+                                    There is no request from you to them
+                                </span>
+                            </h4>
+                        </li>
+                    {% endif %}
+                </ul>   
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'chat/request.js' %}"></script>
+{% endblock %}
