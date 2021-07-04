@@ -162,11 +162,11 @@ def user_profile(request,username):
 def user_friends(request,username):
 
     has_friend = True
-    qs = FriendList.objects.get(user__username=username)
-    if qs.friends is None:
+    qs = get_object_or_404(FriendList,user__username=username)
+    if qs.friends.all().count() == 0:
         has_friend = False
     context = {
-        'friends':qs,
+        'friends':qs.friends.all(),
         'has_friend':has_friend,
         'username':username
     }

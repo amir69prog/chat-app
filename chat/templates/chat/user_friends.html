@@ -1,5 +1,5 @@
 {% extends 'base/index.html' %}
-{% load static %}
+{% load static request_tags %}
 {% block title %}Friends | {{username}}{% endblock %}
 
 {% block content %}
@@ -8,12 +8,29 @@
       <ul>
         {% if has_friend %}
         {% for friend in friends %}
-        <li class="list-group-item">
-          <img class="img-thumbnail" width="50px" src="{{ friend.profile.profile_picture.url }}" alt="">
-          <a style="text-decoration:none" class="badge bg-primary" href="{% url 'user' friend.username %}">{{ friend.username }}</a> |
-          <button class="badge bg-success">Chat</button>
-          <button type="button" onclick="remove_friend('{{friend}}')" class="badge bg-danger">Remove</button>
-        </li>
+            {% get_status_of_friend user friend as status %}
+            <li class="list-group-item">
+            <img class="img-thumbnail" width="50px" src="{{ friend.profile.profile_picture.url }}" alt="">
+            <a style="text-decoration:none" class="badge bg-primary" href="{% url 'user' friend.username %}">{{ friend.username }}</a> |
+            {% if status == 'myself' %}
+            <!-- my friend -->
+            <button class="badge bg-info text-dark">Myself</button>
+            {% elif status == 'friend' %}
+            <!-- my friend -->
+            <button class="badge bg-success">Chat</button>
+            <button onclick="remove_friend('{{friend}}')" class="badge bg-danger">Remove</button>
+            {% elif status == 'them_request' %}
+            <!-- there is request from them to me -->
+            <button onclick="accept_friend('{{friend}}')" class="badge bg-success">accept</button>
+            <button onclick="decline_friend('{{friend}}')" class="badge bg-danger">decline</button>
+            {% elif status == 'my_request' %}
+            <!-- thers is request from me to them -->
+            <button onclick="cancel_friend('{{friend}}')" class="badge bg-danger">cancel request</button>
+            {% else %}
+            <!-- not my friend -->
+            <button onclick="send_request('{{friend}}')" class="badge bg-info text-dark">send friend request</button>
+            </li>
+            {% endif %}
         {% endfor %}
         {% else %}
         <span class="alert alert-danger w-100">There is no friend</span>
@@ -21,4 +38,8 @@
       </ul>
 </div>
 
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'chat/request.js' %}"></script>
+<script src="{% static 'chat/friend.js' %}"></script>
 {% endblock %}
