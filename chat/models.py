@@ -125,9 +125,9 @@ class FriendRequest(models.Model):
         else:
             status = self.status
             print(status)
-            if status == 'accepted' and is_friends(self.sender,self.receiver):
+            if status == 'accepted' and (not is_friends(self.sender,self.receiver)):
                 self.accept()
-                super().save()
+            super().save()
 
 
 class ChatRoomPublic(models.Model):
