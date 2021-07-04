@@ -99,7 +99,7 @@ def search(request):
             Q(nickname__icontains=query)
         )
         if request.user.is_authenticated:
-            qs.exclude(user=request.user)
+            qs.exclude(user__username__iexact=request.user.username)
     else:
         qs = None
     context = {
