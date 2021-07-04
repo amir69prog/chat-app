@@ -16,7 +16,8 @@ def accept_request(receiver,sender):
             sender=sender,
             status='requested'
         )
-        request.accept()
+        request.status = 'accepted'
+        request.save()
     except models.FriendRequest.DoesNotExist:
         return False
     return request
@@ -28,7 +29,8 @@ def cancel_request(receiver,sender):
             sender=sender,
             status='requested'
         )
-        request.cancel()
+        request.status = 'canceled'
+        request.save()
     except models.FriendRequest.DoesNotExist:
         return False
     return request
@@ -40,7 +42,8 @@ def decline_request(receiver,sender):
             sender=sender,
             status='requested'
         )
-        request.decline()
+        request.status = 'declined'
+        request.save()
     except models.FriendRequest.DoesNotExist:
         return False
     return request

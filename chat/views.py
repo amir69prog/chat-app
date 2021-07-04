@@ -67,38 +67,6 @@ def room_private(request,user):
     pass
 
 
-@require_POST
-def create_request(request):
-    ''' Create new friend request '''
-    data = request.POST
-    user = request.user
-    username = data.get('profile')
-    path = data.get('path')
-    profile = Profile.objects.get(user__username=username)
-    try:
-        request_friend = FriendRequest.objects.get(sender=user,receiver=profile.user,status='requested')
-        request_friend.cancel()
-    except FriendRequest.DoesNotExist:
-        r = FriendRequest(sender=user,receiver=profile.user)
-        r.save()
-
-    return redirect(path)
-
-
-@require_POST
-def remove_friends(request):
-    ''' Remove friend '''
-    data = request.POST
-    user = request.user
-    username = data.get('profile')
-    path = data.get('path')
-    friend = User.objects.get(username=username)
-    friends_list = FriendList.objects.get(user=user)
-    print(friends_list.friends.all())
-    print(friend)
-    friends_list.remove_friend(friend)
-    return redirect(path)
-
 @login_required
 def friends_list(request):
     ''' Display friends list '''
