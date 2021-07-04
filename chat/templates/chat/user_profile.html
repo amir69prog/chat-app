@@ -65,6 +65,9 @@
                     <a class="btn btn-primary" href="{% url 'profile' %}" >It's yourself (Profile)</a>
                     {% endif %}
                     </div>
+                    <div class="text-center p-1">
+                        <a href="{% url 'user_friends' profile.username %}"></a>
+                    </div>
                 </div>
             </div>
         </div>

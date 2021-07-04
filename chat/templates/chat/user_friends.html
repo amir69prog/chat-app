@@ -1,0 +1,24 @@
+{% extends 'base/index.html' %}
+{% load static %}
+{% block title %}Friends | {{username}}{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+      <ul>
+        {% if has_friend %}
+        {% for friend in friends %}
+        <li class="list-group-item">
+          <img class="img-thumbnail" width="50px" src="{{ friend.profile.profile_picture.url }}" alt="">
+          <a style="text-decoration:none" class="badge bg-primary" href="{% url 'user' friend.username %}">{{ friend.username }}</a> |
+          <button class="badge bg-success">Chat</button>
+          <button type="button" onclick="remove_friend('{{friend}}')" class="badge bg-danger">Remove</button>
+        </li>
+        {% endfor %}
+        {% else %}
+        <span class="alert alert-danger w-100">There is no friend</span>
+        {% endif %}
+      </ul>
+</div>
+
+{% endblock %}

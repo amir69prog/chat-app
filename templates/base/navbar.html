@@ -12,12 +12,15 @@
                 {% endif %}
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Account</a>
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Account {% if user|get_count_requests %}<span class="badge  rounded-pill bg-danger">{{ user|get_count_requests }}</span>{% endif %}
+                        
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'friends' %}">Friends <span class="badge bg-danger">{{ user|get_count_friends }}</span></a></li>
+                        <li><a class="dropdown-item" href="{% url 'friends' %}">Friends {% if user|get_count_friends %}<span class="badge rounded-pill bg-danger">{{ user|get_count_friends }}</span>{% endif %}</a></li>
                         <li>
-                            <a class="dropdown-item" href="{% url 'friend_request' %}">Friends Requests <span class="badge bg-danger">{{ user|get_count_requests }}</span></a>
+                            <a class="dropdown-item" href="{% url 'friend_request' %}">Friends Requests {% if user|get_count_requests %}<span class="badge rounded-pill bg-danger">{{ user|get_count_requests }}</span>{% endif %}</a>
                             
                         </li>
                         <li><hr class="dropdown-divider" /></li>

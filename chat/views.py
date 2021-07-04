@@ -1,3 +1,4 @@
+from django.contrib.auth import login
 from django.dispatch.dispatcher import receiver
 from django.shortcuts import redirect, render,get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -16,6 +17,8 @@ def is_there_request(sender,receiver):
         return False
     return True
 
+# Views
+@login_required
 def index(request):
     return render(request,'chat/index.html')
 
@@ -93,13 +96,18 @@ def search(request):
     ''' Searching about users '''
     query = request.GET.get('q')
     if len(query) >= 2:
-        qs = Profile.objects.filter(
-            Q(user__username__icontains=query)|
-            Q(user__email__icontains=query)|
-            Q(nickname__icontains=query)
-        )
         if request.user.is_authenticated:
-            qs.exclude(user__username__iexact=request.user.username)
+            qs = Profile.objects.filter(
+                Q(user__username__icontains=query)|
+                Q(user__email__icontains=query)|
+                Q(nickname__icontains=query)
+            ).exclude(user=request.user)
+        else:
+            qs = Profile.objects.filter(
+                Q(user__username__icontains=query)|
+                Q(user__email__icontains=query)|
+                Q(nickname__icontains=query)
+            )
     else:
         qs = None
     context = {
@@ -148,3 +156,18 @@ def user_profile(request,username):
         'is_friend':is_friend
     }
     return render(request,'chat/user_profile.html',context)
+
+
+@login_required
+def user_friends(request,username):
+
+    has_friend = True
+    qs = FriendList.objects.get(user__username=username)
+    if qs.friends is None:
+        has_friend = False
+    context = {
+        'friends':qs,
+        'has_friend':has_friend,
+        'username':username
+    }
+    return render(request,'chat/user_friends.html',context)

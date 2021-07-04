@@ -9,4 +9,5 @@ urlpatterns = [
     path('friends',views.friends_list,name='friends'),
     path('request/all',views.friend_requests,name='friend_request'),
     path('user/<username>',views.user_profile,name='user'),
+    path('friends/<username>',views.user_friends,name='user_friends'),
 ]
