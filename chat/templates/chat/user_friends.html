@@ -21,14 +21,14 @@
             <button onclick="remove_friend('{{friend}}')" class="badge bg-danger">Remove</button>
             {% elif status == 'them_request' %}
             <!-- there is request from them to me -->
-            <button onclick="accept_friend('{{friend}}')" class="badge bg-success">accept</button>
-            <button onclick="decline_friend('{{friend}}')" class="badge bg-danger">decline</button>
+            <button onclick="accept_request('{{friend}}')" class="badge bg-success">accept</button>
+            <button onclick="decline_request('{{friend}}')" class="badge bg-danger">decline</button>
             {% elif status == 'my_request' %}
             <!-- thers is request from me to them -->
-            <button onclick="cancel_friend('{{friend}}')" class="badge bg-danger">cancel request</button>
+            <button onclick="cancel_request('{{friend}}')" class="badge bg-danger">cancel request</button>
             {% else %}
             <!-- not my friend -->
-            <button onclick="send_request('{{friend}}')" class="badge bg-info text-dark">send friend request</button>
+            <button onclick="send_request('{{friend}}')" class="badge bg-warning text-dark">send friend request</button>
             </li>
             {% endif %}
         {% endfor %}
