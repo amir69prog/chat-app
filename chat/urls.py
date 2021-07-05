@@ -10,4 +10,5 @@ urlpatterns = [
     path('request/all',views.friend_requests,name='friend_request'),
     path('user/<username>',views.user_profile,name='user'),
     path('friends/<username>',views.user_friends,name='user_friends'),
+    path('chat/<username>',views.chat_private,name='chat_private'),
 ]

@@ -171,3 +171,7 @@ def user_friends(request,username):
         'username':username
     }
     return render(request,'chat/user_friends.html',context)
+@login_required
+def chat_private(request,username):
+   return HttpResponse()
+
