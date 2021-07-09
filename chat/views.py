@@ -1,13 +1,12 @@
-from django.contrib.auth import login
-from django.dispatch.dispatcher import receiver
+from django.http.response import HttpResponse
 from django.shortcuts import redirect, render,get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST,require_GET
-from chat.models import ChatRoomPublic, FriendList, FriendRequest,Profile,User
+from django.views.decorators.http import require_GET
+from chat.models import ChatRoomPrivate, ChatRoomPublic, FriendList, FriendRequest, MessagePrivate,Profile,User,get_chat_private_room
 from .forms import ProfileForm,UserForm
 from django.contrib import messages
 from django.db.models import Q
-from django.urls import reverse
+
 
 
 def is_there_request(sender,receiver):
@@ -160,8 +159,9 @@ def user_profile(request,username):
 
 @login_required
 def user_friends(request,username):
-
     has_friend = True
+    if request.user.username == username:
+        return redirect('friends')
     qs = get_object_or_404(FriendList,user__username=username)
     if qs.friends.all().count() == 0:
         has_friend = False
@@ -171,7 +171,22 @@ def user_friends(request,username):
         'username':username
     }
     return render(request,'chat/user_friends.html',context)
+
+
+
 @login_required
 def chat_private(request,username):
-   return HttpResponse()
-
+    user = get_object_or_404(User,username=username)
+    private_chat_room = get_chat_private_room(user,request.user)
+    print(private_chat_room)
+    messages = MessagePrivate.objects.filter(room=private_chat_room)
+    friends = FriendList.objects.get(user=request.user)
+    if not private_chat_room:
+        return HttpResponse("this is not your friend")
+    
+    context = {
+        'friend':user,
+        'friends':friends.friends.all(),
+        'messages':messages,
+    }
+    return render(request,'chat/chat_private.html',context) 

@@ -1,26 +1,36 @@
 {% extends 'base/index.html' %}
-
-{% block title %}Search Users{% endblock %}
+{% load static request_tags %}
+{% block title %}Users | {{request.GET.q}}{% endblock %}
 
 {% block content %}
 
-<div class="container">
-    <div class="row">
+<div class="container mt-5 mb-5">
+      <ul>
         {% if users %}
-            {% for profile in users %}
-            <div class="card m-2 p-2" style="width: 18rem;">
-                <img class="card-img-top img-thumbnail" src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}">
-                <div class="card-body">
-                <h3>
-                    <a href="{% url 'user' profile.user.username %}" class="card-title btn btn-primary">{{ profile.user.username }}</a>
-                </h3>
-                </div>
-            </div>
-            {% endfor %}
+        {% for person in users %}
+            {% get_status_of_friend user person.user as status %}
+            <li class="list-group-item">
+            <img class="img-thumbnail" width="50px" src="{{ person.profile_picture.url }}" alt="{{person.username}}">
+            <a style="text-decoration:none" class="badge bg-primary" href="{% url 'user' person.user.username %}">{{ person.user.username }}</a> |
+
+            {% if status == 'friend' %}
+            <!-- my friend -->
+            <a style="text-decoration: none;" href="{% url 'chat_private' person.user.username %}" class="badge bg-success">Chat</a>
+            <button onclick="remove_friend('{{person}}')" class="badge bg-warning">Remove</button>
+            {% else %}
+            <!-- not my friend -->
+            <button class="badge bg-danger">Not friend</button>
+            </li>
+            {% endif %}
+        {% endfor %}
         {% else %}
-        <div class="alert alert-danger m-5">There is no user with <strong>'{{ request.GET.q }}'</strong></div>
+        <span class="alert alert-danger w-100">There are no user with <strong>'{{request.GET.q}}'</strong></span>
         {% endif %}
-    </div>
+      </ul>
 </div>
 
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'chat/js/request.js' %}"></script>
+<script src="{% static 'chat/js/friend.js' %}"></script>
 {% endblock %}

@@ -33,7 +33,7 @@ class Profile(models.Model):
         return self.user.username
 
 class FriendList(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='list_friends')
     friends = models.ManyToManyField(User,blank=True,related_name='friends_user')
 
     def is_friend(self,user):
@@ -61,6 +61,13 @@ class FriendList(models.Model):
         if his_friends.is_friend(self.user):
             his_friends.friends.remove(self.user)
         self.delete_private_chat(friend)
+
+    def get_last_message(self,friend):
+        if self.is_friend(friend):
+            room = get_chat_private_room(self.user,friend)
+            last_message = MessagePrivate.objects.filter(room=room).last()
+            return last_message
+        return None
 
     def __str__(self):
         return self.user.username
@@ -126,6 +133,7 @@ class FriendRequest(models.Model):
             status = self.status
             print(status)
             if status == 'accepted' and (not is_friends(self.sender,self.receiver)):
+                print('accepting')
                 self.accept()
             super().save()
 
@@ -187,3 +195,11 @@ def is_friends(sender,receiver):
     if friends_list_receiver.is_friend(sender) or friends_list_sender.is_friend(receiver):
         return True
     return False
+
+def get_chat_private_room(user_frist,user_secound):
+    room_one = ChatRoomPrivate.objects.filter(first_user=user_frist,secound_user=user_secound) 
+    room_two = ChatRoomPrivate.objects.filter(first_user=user_secound,secound_user=user_frist)
+    if room_one.exists() or room_two.exists():
+        room = room_two if room_two else room_one
+        return room.first()
+    return None 

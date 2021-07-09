@@ -17,7 +17,7 @@
             <button class="badge bg-info text-dark">Myself</button>
             {% elif status == 'friend' %}
             <!-- my friend -->
-            <button class="badge bg-success">Chat</button>
+            <a style="text-decoration: none;" href="{% url 'chat_private' friend.username %}" class="badge bg-success">Chat</a>
             <button onclick="remove_friend('{{friend}}')" class="badge bg-danger">Remove</button>
             {% elif status == 'them_request' %}
             <!-- there is request from them to me -->
@@ -40,6 +40,6 @@
 
 {% endblock %}
 {% block scripts %}
-<script src="{% static 'chat/request.js' %}"></script>
-<script src="{% static 'chat/friend.js' %}"></script>
+<script src="{% static 'chat/js/request.js' %}"></script>
+<script src="{% static 'chat/js/friend.js' %}"></script>
 {% endblock %}

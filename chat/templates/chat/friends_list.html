@@ -11,7 +11,7 @@
         <li class="list-group-item">
           <img class="img-thumbnail" width="50px" src="{{ friend.profile.profile_picture.url }}" alt="">
           <a style="text-decoration:none" class="badge bg-primary" href="{% url 'user' friend.username %}">{{ friend.username }}</a> |
-          <button class="badge bg-success">Chat</button>
+          <a style="text-decoration:none"  href="{% url 'chat_private' friend.username %}" class="badge bg-success">Chat</a>
           <button type="button" onclick="remove_friend('{{friend}}')" class="badge bg-danger">Remove</button>
         </li>
         {% endfor %}
@@ -24,5 +24,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'chat/friend.js' %}"></script>
+<script src="{% static 'chat/js/friend.js' %}"></script>
 {% endblock %}
