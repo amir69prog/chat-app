@@ -1,5 +1,5 @@
 const roomName = JSON.parse(document.getElementById('room-name').textContent);
-
+console.log(roomName)
 const chatSocket = new WebSocket(
     'ws://'
     + window.location.host
@@ -8,44 +8,55 @@ const chatSocket = new WebSocket(
     + '/'
 );
 
-chatSocket.onmessage = function(e) {
-    // document.querySelector('#chat-log').value = null;
-    const data = JSON.parse(e.data);
-    const messages = JSON.parse(data.messages)
-    for (let i = 0; i < messages.length; i++) {
-        const element = messages[i];
-        const message = element.fields.content
-        document.querySelector('#chat-log').value += (message + '\n');
-        
-    }
-};
-    
+chatSocket.onopen = function (e) {
+
+}
+
+chatSocket.onmessage = function(event){
+	let data = JSON.parse(event.data)
+    console.log(data)
+	const user = data.message.author
+	const picture_url = data.message.profile_picture
+	const message = data.message.content
+    const current_user = JSON.parse(document.getElementById('current_user').textContent);
+	newMessage(user,picture_url,message,current_user)
+}
 
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly');
 };
 
-document.querySelector('#chat-message-input').focus();
-document.querySelector('#chat-message-input').onkeyup = function(e) {
-    if (e.keyCode === 13) {  // enter, return
-        document.querySelector('#chat-message-submit').click();
-    }
+
+function newMessage(user,picture_url,message,current_user) {
+	if ( user == current_user) {
+		$('<li class="sent"><img src="' + picture_url + '" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+	} else {
+		$('<li class="replies"><img src="' + picture_url + '" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+	}
+	$('.message-input input').val(null);
+	window.scrollBy(0,50); // horizontal and vertical scroll increments
+	scrolldelay = setTimeout('pageScroll()',100); // scrolls every 100 milliseconds
+
+}
+
+
+function sendMessage() {
+	message = $(".message-input input").val();
+	if($.trim(message) == '') {
+		return false;
+	}
+	let data = {
+		'message':message,
+		'command':'send'
+	}
+	chatSocket.send(JSON.stringify(data))
 };
 
-document.querySelector('#chat-message-submit').onclick = function(e) {
-    const messageInputDom = document.querySelector('#chat-message-input');
-    const message = messageInputDom.value;
-    chatSocket.send(JSON.stringify({
-        'message': message,
-        'command':'send'
-    }));
-    messageInputDom.value = '';
-};
-chatSocket.onopen = function (){
-    const messageInputDom = document.querySelector('#chat-message-input');
-    const message = messageInputDom.value;
-    chatSocket.send(JSON.stringify({
-        'command':'fetch',
-        'message':message
-    }))
+
+$(window).on('keydown', function(e) {
+if (e.which == 13) {
+	sendMessage();
+    console.log('hey')
+	return false;
 }
+});

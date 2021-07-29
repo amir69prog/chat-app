@@ -11,4 +11,5 @@ urlpatterns = [
     path('user/<username>',views.user_profile,name='user'),
     path('friends/<username>',views.user_friends,name='user_friends'),
     path('chat/<username>',views.chat_private,name='chat_private'),
+    path('room/create/',views.create_public_room,name='public_room'),
 ]

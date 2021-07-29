@@ -32,7 +32,9 @@ def get_status_of_friend(user,friend):
     else:
         status = 'not_friend'
     return status
-@register.filter(name='get_last_message')
-def get_last_message(friend):
-    friend_list = FriendList.objects.get(user=friend)
+
+
+@register.simple_tag
+def get_last_message(user, friend):
+    friend_list = FriendList.objects.get(user=user)
     return friend_list.get_last_message(friend)

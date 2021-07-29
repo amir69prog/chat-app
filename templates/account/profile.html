@@ -98,6 +98,9 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item"><a class="btn btn-primary" href="{% url 'friends' %}">Friends <span class="badge rounded-pill bg-danger">{{ user|get_count_friends }}</span></a></li>
                             <li class="list-group-item"><a class="btn btn-info" href="{% url 'friend_request' %}">Friends Request <span class="badge rounded-pill bg-danger">{{ user|get_count_requests }}</span></a></li>
+                            {% if user.is_staff %}
+                            <li class="list-group-item"><a class="btn btn-dark" href="{% url 'public_room' %}">Create Public Room</a></li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>

@@ -2,10 +2,11 @@
 {% block title %}Chat Room{% endblock %}
 {% load static %}
 {% block content %}
+    <div class="container m-5 col-6">
     <h2>what chat room would you like to enter?</h2>
-    <input type="text" id="room_name">
-    <button onclick="set_path();" id="input_room_name">Enter</button>
-
+    <input type="text" class="form-control" id="room_name">
+    <button onclick="set_path();" class='btn btn-primary mt-2' id="input_room_name">Enter</button>
+    </div>
 {% endblock %}
 
 {% block scripts %}

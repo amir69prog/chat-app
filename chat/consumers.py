@@ -1,7 +1,7 @@
 import json
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer,AsyncConsumer
 from asgiref.sync import async_to_sync
-from .models import FriendList, FriendRequest, MessagePublic, ChatRoomPublic
+from .models import FriendList, FriendRequest, MessagePrivate, MessagePublic, ChatRoomPublic,ChatRoomPrivate
 from django.core.serializers import serialize
 import chat.Internalfunctions as func
 from chat.models import User
@@ -83,6 +83,7 @@ class RequestConsumer(WebsocketConsumer):
         print(data)
         self.send(data)
 
+
 class FriendConsumer(WebsocketConsumer):
 
     def remove(self,message):
@@ -119,39 +120,31 @@ class FriendConsumer(WebsocketConsumer):
 
 
 class ChatConsumer(WebsocketConsumer):
-    def messages_to_json(self,messages):
-        qss = serialize('json',messages,fields=('content'))
-        return qss
-
-
-    def fetch_messaeges(self,message):
-        room = ChatRoomPublic.objects.get(name=self.room)
-        messages = MessagePublic.objects.filter(room=room).order_by('timestmap')
-        content = {
-            'type':'chat_messages',
-            'messages':self.messages_to_json(messages),
+    def message_to_json(self,message):
+        data = {
+            'author':message.author.username,
+            'content':message.content,
+            'profile_picture':message.author.profile.profile_picture.url,
         }
-        self.send_message(content)
-
+        return data
+    
     def create_message(self,message):
         ''' Create a new message and send to chat '''
         room = ChatRoomPublic.objects.get(name=self.room)
-        new_message = MessagePublic.objects.create(
+        new_message = MessagePublic(
             author=self.author,
             content=message,
             room=room
         )
-        obj_message = MessagePublic.objects.filter(pk=new_message.pk)
-        
+        new_message.save()
         content = {
-            'type':'chat_messages',
-            'messages':self.messages_to_json(obj_message),
+            'type':'chat_message',
+            'message':self.message_to_json(new_message)
         }
         self.send_message(content)
     
     commands = {
         'send':create_message,
-        'fetch':fetch_messaeges
     }
 
 
@@ -185,5 +178,75 @@ class ChatConsumer(WebsocketConsumer):
             content
         )
 
-    def chat_messages(self,content):
+    def chat_message(self,content):
         self.send(text_data=json.dumps(content))
+        print(content)
+
+class ChatPrivateConsumer(WebsocketConsumer):
+    def message_to_json(self,message):
+        data = {
+            'author':message.author.username,
+            'content':message.content,
+            'profile_picture':message.author.profile.profile_picture.url,
+        }
+        return data
+
+    
+    def create_message(self,message):
+        new_message = MessagePrivate(
+            author=self.user,
+            content=message,
+            room=self.room_name
+        )
+        new_message.save()
+        
+        content = {
+            'type':'send_data',
+            'message':self.message_to_json(new_message),
+            'action':'new_message',
+        }
+        self.send_message(content)
+    
+    def send_message(self,content):
+        async_to_sync(self.channel_layer.group_send)(
+            self.group,
+            content
+        )
+
+    def send_data(self,content):
+        self.send(text_data=json.dumps(content))
+
+    commands = {
+        'send_message':create_message
+    }
+
+
+    def get_room(self):
+        qs = ChatRoomPrivate.get_room(self.user,self.friend)
+        return qs
+
+    def connect(self):
+        self.user_name = self.scope['user']
+        self.friend_name = self.scope['url_route']['kwargs']['username']
+        self.user = User.objects.get(username=self.user_name)
+        self.friend = User.objects.get(username=self.friend_name)
+        self.room_name = self.get_room()
+        print(self.room_name)
+        self.group = f'chat_private_{str(self.room_name)}'
+        async_to_sync(self.channel_layer.group_add)(
+            self.group,
+            self.channel_name
+        )
+        print(self.user)
+        self.accept()
+
+    def disconnect(self, code):
+        async_to_sync(self.channel_layer.group_discard)(
+            self.group,
+            self.channel_name
+        )
+
+    def receive(self, text_data):
+        data = json.loads(text_data)
+        message = data['message']
+        self.commands[data['type']](self,message)

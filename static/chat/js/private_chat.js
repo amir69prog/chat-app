@@ -1,3 +1,6 @@
+let url = 'ws://' + document.location.host + '/' + 'private' + document.location.pathname;
+const socket = new WebSocket(url)
+
 $(".messages").animate({ scrollTop: $(document).height() }, "fast");
 
 $("#profile-img").click(function() {
@@ -32,25 +35,55 @@ $("#status-options ul li").click(function() {
 	$("#status-options").removeClass("active");
 });
 
-function newMessage() {
+socket.onmessage = function(event){
+	let data = JSON.parse(event.data)
+	const user = data.message.author
+	const picture_url = data.message.profile_picture
+	const message = data.message.content
+	if (data.action == 'new_message')
+		newMessage(user,picture_url,message)
+}
+
+
+function newMessage(user,picture_url,message) {
+	const url = document.location.pathname;
+	const username = url.split("/").pop();
+	if ( user == username) {
+		$('<li class="sent"><img src="' + picture_url + '" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+		$('.contact.active .preview').html(message);
+	} else {
+		$('<li class="replies"><img src="' + picture_url + '" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+		$('.contact.active .preview').html(message);
+	}
+	$('.message-input input').val(null);
+	// $(".messages").animate({ scrollTop: $(document).height() }, "fast");
+}
+
+
+function sendMessage() {
 	message = $(".message-input input").val();
 	if($.trim(message) == '') {
 		return false;
 	}
-	$('<li class="sent"><img src="http://emilcarlsson.se/assets/mikeross.png" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
-	$('.message-input input').val(null);
-	$('.contact.active .preview').html('<span>You: </span>' + message);
-	$(".messages").animate({ scrollTop: $(document).height() }, "fast");
+	let data = {
+		'type':'send_message',
+		'message':message
+	}
+	socket.send(JSON.stringify(data))
 };
 
+
 $('.submit').click(function() {
-  newMessage();
+	sendMessage();
+  });
+  
+$(window).on('keydown', function(e) {
+if (e.which == 13) {
+	sendMessage();
+	return false;
+}
 });
 
-$(window).on('keydown', function(e) {
-  if (e.which == 13) {
-    newMessage();
-    return false;
-  }
-});
-//# sourceURL=pen.js
+function chat_private(username) {
+	window.location.pathname = '/chat/' + username ;
+};

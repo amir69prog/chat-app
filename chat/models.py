@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -19,6 +20,11 @@ def get_default_picture():
     return path
 
 
+def validate_room(name):
+    if len(name) < 4:
+        raise ValidationError('The length name must be bigger than four')
+    else:
+        return name
 ## Functions End
 
 
@@ -66,7 +72,7 @@ class FriendList(models.Model):
         if self.is_friend(friend):
             room = get_chat_private_room(self.user,friend)
             last_message = MessagePrivate.objects.filter(room=room).last()
-            return last_message
+            return last_message.content
         return None
 
     def __str__(self):
@@ -139,7 +145,7 @@ class FriendRequest(models.Model):
 
 
 class ChatRoomPublic(models.Model):
-    name = models.CharField(max_length=100,unique=True)
+    name = models.CharField(max_length=100,unique=True,validators=[validate_room])
 
     def __str__(self):
         return self.name
@@ -149,8 +155,14 @@ class ChatRoomPrivate(models.Model):
     first_user = models.ForeignKey(User,on_delete=models.CASCADE)
     secound_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='secound_user_room')
 
+    @classmethod
+    def get_room(cls,user,friend):
+        user_to_friend = cls.objects.filter(first_user=user,secound_user=friend)
+        friend_to_user = cls.objects.filter(first_user=friend,secound_user=user)
+        return friend_to_user.first() if friend_to_user.exists() else user_to_friend.first()
+
     def __str__(self):
-        return f'{self.first_user} | {self.secound_user}'
+        return f'{self.first_user}-{self.secound_user}'
 
 
 class MessagePublic(models.Model):

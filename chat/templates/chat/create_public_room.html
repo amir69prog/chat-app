@@ -1,0 +1,15 @@
+{% extends 'base/index.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container col-6">
+    <div class="row mt-10">
+        <form action="{% url 'public_room' %}" method="POST" class="form-group">
+            {%csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary mt-2">Create</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -2,12 +2,12 @@ from django.http.response import HttpResponse
 from django.shortcuts import redirect, render,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
-from chat.models import ChatRoomPrivate, ChatRoomPublic, FriendList, FriendRequest, MessagePrivate,Profile,User,get_chat_private_room
-from .forms import ProfileForm,UserForm
+from chat.models import ChatRoomPublic, FriendList, FriendRequest, MessagePrivate, MessagePublic,Profile,User,get_chat_private_room
+from .forms import ProfileForm,UserForm,ChatRoomPublicForm
 from django.contrib import messages
 from django.db.models import Q
-
-
+from django.contrib.admin.views.decorators import staff_member_required
+from django.urls import reverse
 
 def is_there_request(sender,receiver):
     try:
@@ -26,7 +26,9 @@ def index(request):
 def room_public(request,room_name):
     ''' Public Room '''
     room = get_object_or_404(ChatRoomPublic,name=room_name)
-    return render(request,'chat/room.html',{'room_name':room_name})
+    messages = MessagePublic.objects.filter(room=room)
+
+    return render(request,'chat/room.html',{'room_name':room_name,'list_message':messages})
 
 
 def profile_view(request):
@@ -178,7 +180,6 @@ def user_friends(request,username):
 def chat_private(request,username):
     user = get_object_or_404(User,username=username)
     private_chat_room = get_chat_private_room(user,request.user)
-    print(private_chat_room)
     messages = MessagePrivate.objects.filter(room=private_chat_room)
     friends = FriendList.objects.get(user=request.user)
     if not private_chat_room:
@@ -190,3 +191,22 @@ def chat_private(request,username):
         'messages':messages,
     }
     return render(request,'chat/chat_private.html',context) 
+
+
+@staff_member_required
+def create_public_room(request):
+    form = ChatRoomPublicForm()
+    if request.POST:
+        form = ChatRoomPublicForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'congratulation... The room now is aviable for users\nyou can now leave message.')
+            return redirect(
+                reverse('room',kwargs={'room_name':form.cleaned_data.get('name')})
+            )
+        else:
+            form = ChatRoomPublicForm(request.POST)
+    context = {
+        'form':form,
+    }
+    return render(request,'chat/create_public_room.html',context)

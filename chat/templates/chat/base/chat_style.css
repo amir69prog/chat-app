@@ -546,6 +546,7 @@ body {
     max-height: calc(100% - 93px);
     overflow-y: scroll;
     overflow-x: hidden;
+    width: 100%;
     }
     @media screen and (max-width: 735px) {
     #frame .content .messages {

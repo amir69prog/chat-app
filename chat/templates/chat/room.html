@@ -1,13 +1,53 @@
-{% extends 'base/index.html' %}
-{% load static %}
+{% extends 'chat/base/base.html' %}
+{% load static request_tags %}
 
 {% block title %}Room | {{room_name}}{% endblock %}
+
+{% block styles %}
+
+    <style class="cp-pen-styles">
+        {% include 'chat/base/chat_style.css' %}
+    
+        .room_name {
+            text-align: center;
+        }
+        #frame .content {
+            width: 100%;
+        }
+    </style>
+
+{% endblock %}
+
 {% block content %}
-    <div class="m-10">
-        <textarea id="chat-log" disabled="" cols="100" rows="20"></textarea><br>
-    <input id="chat-message-input"  type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
+    {{ user.username|json_script:"current_user" }}
+    <div id="frame">
+        <div class="content">
+            <a href="{% url 'index' %}" class="btn btn-dark m-0"><h3>Home</h3></a>
+            {% for msg in messages %}
+                <p class="alert alert-{{ msg.level_tag }}">{{ msg }}</p>
+            {% endfor %}
+            <div class="contact-profile">
+                <h2 class="room_name">{{ room_name }}</h2>
+            </div>
+            <div class="messages">
+                <ul>
+                    {% for msg in list_message %}
+                    <li class="{% if msg.author.username == user.username %}sent{% else %}replies{% endif %}">
+                        <img src="{{ msg.author.profile.profile_picture.url }}" alt="" />
+                        <p>{{ msg.content }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="message-input">
+                <div class="wrap">
+                <input type="text" placeholder="Write your message..." />
+                <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
+                <button onclick="sendMessage()" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
